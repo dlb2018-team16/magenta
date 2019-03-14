@@ -118,7 +118,7 @@ class NSynthTFRecordDataset(BaseDataset):
     if len(self._instruments) == 2:
       dataset = dataset.filter(lambda w, l, p, s: tf.logical_or(tf.equal(s, self._instruments[0]), tf.equal(s, self._instruments[1]))[0])
     elif len(self._instruments) == 1:
-      dataset = dataset.filter(lambda w, l, p, s: tf.equal(s, self._instruments)[0])
+      dataset = dataset.filter(lambda w, l, p, s: tf.equal(s, self._instruments[0])[0])
     # Filter just pitches 24-84
     dataset = dataset.filter(lambda w, l, p, s: tf.greater_equal(p, 24)[0])
     dataset = dataset.filter(lambda w, l, p, s: tf.less_equal(p, 84)[0])
