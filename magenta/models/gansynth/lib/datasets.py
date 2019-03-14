@@ -61,7 +61,7 @@ class NSynthTFRecordDataset(BaseDataset):
 
   def __init__(self, config):
     super().__init__(config)
-    self._instruments = int(config['instruments'])
+    self._instruments = [int(i) for i in config['instruments'].split(',')] if 0 < len(config['instruments']) else None
 
   def _get_dataset_from_path(self):
     dataset = tf.data.Dataset.list_files(self._train_data_path)
@@ -115,7 +115,10 @@ class NSynthTFRecordDataset(BaseDataset):
     dataset = dataset.map(_parse_nsynth, num_parallel_calls=4)
 
     # Filter just acoustic instruments (as in the paper)
-    dataset = dataset.filter(lambda w, l, p, s: tf.equal(s, self._instruments)[0])
+    if len(self._instruments) == 2:
+      dataset = dataset.filter(lambda w, l, p, s: tf.logical_or(tf.equal(s, self._instruments[0]), tf.equal(s, self._instruments[1]))[0])
+    elif len(self._instruments) == 1:
+      dataset = dataset.filter(lambda w, l, p, s: tf.equal(s, self._instruments)[0])
     # Filter just pitches 24-84
     dataset = dataset.filter(lambda w, l, p, s: tf.greater_equal(p, 24)[0])
     dataset = dataset.filter(lambda w, l, p, s: tf.less_equal(p, 84)[0])
